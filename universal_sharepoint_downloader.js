@@ -98,6 +98,22 @@
             try { return u.split('?')[0]; } catch (e) { return u; }
         };
 
+        // Helper to extract best filename
+        const getBestFilename = (a) => {
+            try {
+                const rawUrl = a.href;
+                // Remove query params and hash
+                const cleanUrl = rawUrl.split('?')[0].split('#')[0];
+                const urlName = decodeURIComponent(cleanUrl.split('/').pop());
+
+                // If URL filename looks valid/useful, prefer it (captures .part-aa, etc.)
+                if (urlName && urlName.includes('.') && urlName.length > 2) {
+                    return urlName;
+                }
+            } catch (e) { }
+            return a.innerText || a.getAttribute('title') || "unknown_file";
+        };
+
         rows.forEach(row => {
             // Find the primary link/name
             // Usually valid file links contain '/Documents/' or similar, and end with a file extension
@@ -115,7 +131,7 @@
             });
 
             if (fileLink) {
-                const name = fileLink.innerText || fileLink.getAttribute('title') || fileLink.href.split('/').pop();
+                const name = getBestFilename(fileLink);
                 const url = fileLink.href;
 
                 // Dedupe
@@ -141,7 +157,7 @@
                 const segment = href.split('/').pop();
                 if (segment.includes('.') && segment.length > 3) {
                     if (!seenUrls.has(href)) {
-                        const name = a.innerText || segment;
+                        const name = getBestFilename(a);
                         if (CONFIG.filterKeyword && !name.includes(CONFIG.filterKeyword)) return;
                         seenUrls.add(href);
                         files.push({ name: name.trim(), url: href });
@@ -150,7 +166,42 @@
             });
         }
 
-        return files;
+        // =================================================================================
+        //  filename DEDUPLICATION
+        // =================================================================================
+        // If multiple files have the exact same name (common in SharePoint "parts" or versioning),
+        // we rename them to "Filename (1).ext", "Filename (2).ext", etc.
+        const uniqueFiles = [];
+        const usedNames = new Set();
+
+        files.forEach(f => {
+            let finalName = f.name;
+            let counter = 1;
+
+            // Separate extension for cleaner renaming: "file.tar.gz" -> "file (1).tar.gz"
+            // We'll treat the *last* dot as the extension separator for simplicity, 
+            // or if it ends in .tar.gz, we might want to preserve that. 
+            // Standard 'path.parse' logic:
+            let base = finalName;
+            let ext = "";
+            const lastDot = finalName.lastIndexOf('.');
+
+            if (lastDot > 0) {
+                base = finalName.substring(0, lastDot);
+                ext = finalName.substring(lastDot);
+            }
+
+            while (usedNames.has(finalName)) {
+                finalName = `${base} (${counter})${ext}`;
+                counter++;
+            }
+
+            usedNames.add(finalName);
+            f.name = finalName;
+            uniqueFiles.push(f);
+        });
+
+        return uniqueFiles;
     };
 
 
