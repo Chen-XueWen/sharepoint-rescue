@@ -1,6 +1,7 @@
 # Universal SharePoint Sequential Downloader
 
 A robust JavaScript tool designed to download **all visible files** from a SharePoint/OneDrive page directly to your local file system.
+![Sharepoint Rescue Sample Screenshot](sharepointrescue.png)
 
 ## 💡 Motivation
 
