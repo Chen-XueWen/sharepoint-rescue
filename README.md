@@ -37,6 +37,7 @@ A robust JavaScript tool designed to download **all visible files** from a Share
 3. **Select Output Folder**
     - A browser prompt will appear.
     - Select (or create) the folder anywhere on your computer where you want to save the files.
+    - Hint: If chrome cannot store the files in Downloads folder, make a new folder inside Downloads and choose this new folder.
     - Click **Allow** if asked for permission.
 
 4. **Sit Back**
