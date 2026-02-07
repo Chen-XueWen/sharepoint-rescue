@@ -2,7 +2,7 @@
 
 A robust JavaScript tool designed to download **all visible files** from a SharePoint/OneDrive page directly to your local file system.
 ![Sharepoint Rescue Sample Screenshot](sharepointrescue.png)
-**Note: It works in the classic sharepoint view only. Do not support recursive downloading of folders yet but it is a small update.**
+**Note: It works in the classic sharepoint view only. Does not support recursive downloading of folders yet but it is a small update.**
 
 ## 💡 Motivation
 
